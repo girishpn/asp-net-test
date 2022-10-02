@@ -54,4 +54,4 @@ jobs:
           app-name: 'girishtest'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0B854246F0FB4981A30B643E94C76D58 }}
-          package: .
+          package: /testapp/
