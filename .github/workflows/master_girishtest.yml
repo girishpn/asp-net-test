@@ -53,5 +53,6 @@ jobs:
         with:
           app-name: 'girishtest'
           slot-name: 'Production'
+          path: '/D:\home\site\wwwroot\testapp>'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0B854246F0FB4981A30B643E94C76D58 }}
-          package: /testapp/
+          package: .
