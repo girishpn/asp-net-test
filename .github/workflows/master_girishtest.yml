@@ -32,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ASP-app
-          path: 'D:\home\site\wwwroot\testapp\'
+          path: '\published\testapp\'
 
   deploy:
     runs-on: windows-latest
