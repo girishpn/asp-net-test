@@ -54,4 +54,4 @@ jobs:
           app-name: 'girishtestapp1'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1025E1F2FBF84BDC8899F2538590205E }}
-          package: app-service-web-dotnet-get-started-1
+          package: \testapp1\.
