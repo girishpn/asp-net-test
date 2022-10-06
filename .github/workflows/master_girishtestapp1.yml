@@ -29,7 +29,7 @@ jobs:
         run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:_PackageTempDir="\testapp1\"
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ASP-app
           path: '/testapp1/**'
@@ -54,4 +54,4 @@ jobs:
           app-name: 'girishtestapp1'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1025E1F2FBF84BDC8899F2538590205E }}
-          package: D:\a\app-service-web-dotnet-get-started-1\
+          package: '/testapp1/**'
