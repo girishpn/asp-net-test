@@ -46,7 +46,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ASP-app
-          path: D:\a\testapp1
+          path: ASP-app
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -55,4 +55,4 @@ jobs:
           app-name: 'girishtestapp1'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1025E1F2FBF84BDC8899F2538590205E }}
-          package: D:\a\testapp1
+          package: ASP-app
