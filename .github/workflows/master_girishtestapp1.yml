@@ -54,5 +54,5 @@ jobs:
         with:
           app-name: 'girishtestapp1'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1025E1F2FBF84BDC8899F2538590205E }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_9D062571317345DE80CBA0C6E3EECAEB }}
           package: D:\a\asp-net-test\asp-net-test\
