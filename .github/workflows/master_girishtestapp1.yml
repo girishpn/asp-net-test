@@ -26,13 +26,13 @@ jobs:
         run: nuget restore
 
       - name: Publish to folder
-        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="\testapp6\"
+        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="\testapp7\"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
-          name: testapp6
-          path: '/testapp6/**'
+          name: testapp7
+          path: '/testapp7/**'
 
   deploy:
     runs-on: windows-latest
@@ -45,8 +45,8 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
-          name: testapp6
-          path: testapp6
+          name: testapp7
+          path: testapp7
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
