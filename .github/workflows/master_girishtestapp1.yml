@@ -53,7 +53,7 @@ jobs:
         with: 
           server: waws-prod-blu-443.ftp.azurewebsites.windows.net
           username: aspnetapptest1\$aspnetapptest1
-          password: ${{ FTP_PASSWD2 }}
+          password: ${{ secrets.FTP_PASSWD2 }}
           protocol: ftp
           local-dir: D:/testapp2/
           server-dir: /site/wwwroot/app2/
