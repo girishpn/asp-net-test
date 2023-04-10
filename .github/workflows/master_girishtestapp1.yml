@@ -34,6 +34,6 @@ jobs:
           server: waws-prod-dm1-333.ftp.azurewebsites.windows.net
           username: aspnetapptest\$aspnetapptest
           password: ${{ secrets.FTP_PASSWD1 }}
-          protocol: ftp
+          protocol: ftps
           local-dir: D:/testapp2/
           server-dir: /site/wwwroot/app1/          
