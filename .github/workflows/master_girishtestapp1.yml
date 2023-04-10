@@ -48,11 +48,12 @@ jobs:
           name: testapp2
           path: testapp2
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: 'girishtestapp1'
-          slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1025E1F2FBF84BDC8899F2538590205E }}
-          package: D:\a\asp-net-test\asp-net-test\
+      - name: Sync Files
+        uses: SamKirkland/FTP-Deploy-Action@4.3.2
+        with: 
+          server: waws-prod-dm1-333.ftp.azurewebsites.windows.net
+          username: aspnetapptest\$aspnetapptest
+          password: ${{ FTP_PASSWD1 }}
+          protocol: ftp
+          local-dir: D:/testapp2/
+          server-dir: /site/wwwroot/app1/          
