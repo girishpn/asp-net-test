@@ -36,4 +36,4 @@ jobs:
           password: ${{ secrets.FTP_PASSWD2 }}
           protocol: ftps
           local-dir: D:/testapp2/
-          server-dir: /site/wwwroot/app2/
+          server-dir: /site/wwwroot/app1/
