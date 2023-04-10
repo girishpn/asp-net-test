@@ -54,5 +54,5 @@ jobs:
           username: aspnetapptest1\$aspnetapptest1
           password: ${{ secrets.FTP_PASSWD2 }}
           protocol: ftp
-          local-dir: /published/
+          local-dir: d:/published/
           server-dir: /site/wwwroot/app2/  
