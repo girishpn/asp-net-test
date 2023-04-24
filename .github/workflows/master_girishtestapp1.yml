@@ -31,8 +31,8 @@ jobs:
       - name: Sync Files
         uses: SamKirkland/FTP-Deploy-Action@4.3.2
         with: 
-          server: waws-prod-dm1-333.ftp.azurewebsites.windows.net
-          username: aspnetapptest\$aspnetapptest
+          server: waws-prod-blu-327.ftp.azurewebsites.windows.net
+          username: aspdotnetapplication\$aspdotnetapplication
           password: ${{ secrets.FTP_PASSWD1 }}
           protocol: ftps
           local-dir: D:/testapp2/
