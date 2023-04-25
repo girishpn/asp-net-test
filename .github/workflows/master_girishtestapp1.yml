@@ -77,8 +77,8 @@ jobs:
           azcliversion: 2.30.0
           inlineScript: |
                        az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication1.azurewebsites.net          
+  
       - name: Sync Files
-        
         uses: SamKirkland/FTP-Deploy-Action@4.3.2
         with: 
           server: waws-prod-blu-327.ftp.azurewebsites.windows.net
