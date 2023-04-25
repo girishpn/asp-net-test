@@ -27,12 +27,7 @@ jobs:
       - name: Sleep for 60 seconds
         run: sleep 60s
         shell: bash 
-      - name: Azure CLI script
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.30.0
-          inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication.azurewebsites.net  
+  
   build_and_deploy_to_Green-app:
     needs: Pull-Green-app-service-from-Gateway
     runs-on: windows-latest
