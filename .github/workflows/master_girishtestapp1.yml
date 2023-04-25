@@ -25,6 +25,7 @@ jobs:
           inlineScript: |
                        az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication.azurewebsites.net
   build:
+    needs: Pull-app-service-from-Gateway
     runs-on: windows-latest
 
     steps:
