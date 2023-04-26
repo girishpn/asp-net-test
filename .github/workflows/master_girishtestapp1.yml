@@ -28,63 +28,63 @@ jobs:
         run: sleep 60s
         shell: bash 
   
-  build_and_deploy_to_Green-app:
-    needs: Pull-Green-app-service-from-Gateway
-    runs-on: windows-latest
+  Build_and_deploy_to_Green-app:
+  needs: Pull-Green-app-service-from-Gateway
+  steps:
+     
+     - name: Setup MSBuild path
+       uses: microsoft/setup-msbuild@v1.0.2
 
-    steps:
-      - uses: actions/checkout@v2
+     - name: Setup NuGet
+       uses: NuGet/setup-nuget@v1.0.5
 
-      - name: Setup MSBuild path
-        uses: microsoft/setup-msbuild@v1.0.2
+     - name: Restore NuGet packages
+       run: nuget restore
 
-      - name: Setup NuGet
-        uses: NuGet/setup-nuget@v1.0.5
-
-      - name: Restore NuGet packages
-        run: nuget restore
-
-      - name: Publish to folder
-        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="D:\testapp2"
-    
-        shell: powershell               
-      - name: Sync Files
-        uses: SamKirkland/FTP-Deploy-Action@4.3.2
-        with: 
+     - name: Publish to folder
+       run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="\testapp2"
+       shell: powershell               
+  
+     - name: Sync Files
+       uses: SamKirkland/FTP-Deploy-Action@4.3.2
+       with: 
           server: waws-prod-blu-327.ftp.azurewebsites.windows.net
           username: aspdotnetapplication1\$aspdotnetapplication1
           password: ${{ secrets.FTP_PASSWD2 }}
           protocol: ftps
-          local-dir: D:/testapp2/
+          local-dir: /testapp2/
           server-dir: /site/wwwroot/app1/
-  Pull-Blue-app-service-from-Gateway:
-    needs: build_and_deploy_to_Green-app
-    runs-on: ubuntu-latest
-    steps:
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Azure CLI script
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.30.0
-          inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication1.azurewebsites.net          
-  
-      - name: Sync Files
-        uses: SamKirkland/FTP-Deploy-Action@4.3.2
-        with: 
-          server: waws-prod-blu-327.ftp.azurewebsites.windows.net
-          username: aspdotnetapplication\$aspdotnetapplication
-          password: ${{ secrets.FTP_PASSWD1 }}
-          protocol: ftps
-          local-dir: D:/testapp2/
-          server-dir: /site/wwwroot/app1/
-      - name: Azure CLI script
-        uses: azure/CLI@v1
-        with:
+     - name: Add Back Green APP
+       uses: azure/CLI@v1
+       with:
           azcliversion: 2.30.0
           inlineScript: |
                        az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication1.azurewebsites.net
+                       
+  Pull-Blue-app-service-from-Gateway:
+  needs: Build_and_deploy_to_Green-app:
+  steps:
+     - name: Azure CLI script
+       uses: azure/CLI@v1
+       with:
+          azcliversion: 2.30.0
+          inlineScript: |
+                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication.azurewebsites.net          
+  Deploy-to-Blue-App:
+  needs: Pull-Blue-app-service-from-Gateway
+  steps:
+     - name: Sync Files
+       uses: SamKirkland/FTP-Deploy-Action@4.3.2
+       with: 
+         server: waws-prod-blu-327.ftp.azurewebsites.windows.net
+         username: aspdotnetapplication\$aspdotnetapplication
+         password: ${{ secrets.FTP_PASSWD1 }}
+         protocol: ftps
+         local-dir: D:/testapp2/
+         server-dir: /site/wwwroot/app1/
+    - name: Azure CLI script
+      uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication.azurewebsites.net
