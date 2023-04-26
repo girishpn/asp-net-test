@@ -4,9 +4,9 @@
 name: Build and deploy ASP app to Azure Web App - girishtestapp1
 
 on:
- # push:
- #   branches:
- #     - master
+  push:
+    branches:
+      - master
   workflow_dispatch:
 
 jobs:
@@ -42,16 +42,33 @@ jobs:
     needs: Build-Deploy-green
     uses: asp-net-test/.github/workflows/green-add.yml@master
          
-  Pull-Blue-APP-Deployto-Blue:
+  Pull-Blue-APP:
     needs: Add-Green-APP-Back
     uses: asp-net-test/.github/workflows/blue-pull.yml@master
-          
+  DepolytoBlue:
+    needs: Pull-Blue-APP
+    runs-on: windows-latest
+    steps:
+      - name: Setup MSBuild path
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.0.5
+
+      - name: Restore NuGet packages
+        run: nuget restore
+
+      - name: Publish to folder
+        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="\testapp2"  
       - name: Sync Files
         uses: SamKirkland/FTP-Deploy-Action@4.3.2
         with: 
-         server: waws-prod-blu-327.ftp.azurewebsites.windows.net
-         username: aspdotnetapplication\$aspdotnetapplication
-         password: ${{ secrets.FTP_PASSWD1 }}
-         protocol: ftps
-         local-dir: D:/testapp2/
-         server-dir: /site/wwwroot/app1/     
+           server: waws-prod-blu-327.ftp.azurewebsites.windows.net
+           username: aspdotnetapplication\$aspdotnetapplication
+           password: ${{ secrets.FTP_PASSWD1 }}
+           protocol: ftps
+           local-dir: D:/testapp2/
+           server-dir: /site/wwwroot/app1/     
+  Add-Blue-App-Back:
+    needs: DepolytoBlue 
+    uses: asp-net-test/.github/workflows/blue-add.yml@master
