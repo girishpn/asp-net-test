@@ -10,27 +10,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  Build-Deploy:
-    runs-on: ubuntu-latest
+  pull-green-app:
+    uses: asp-net-test/.github/workflows/green-pull.yml@master
+  Build-Deploy-green:
+    needs: pull-green-app
+    runs-on: windows-latest
     steps:
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Pull-index1-app
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.30.0
-          inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication.azurewebsites.net
-      - name: Sleep for 60 seconds
-        run: sleep 60s
-        shell: bash 
-  
-#  Build_and_deploy_to_Green-app:
-#    needs: Pull-Green-app-service-from-Gateway
-#    steps:
       - name: Setup MSBuild path
         uses: microsoft/setup-msbuild@v1.0.2
 
@@ -52,30 +37,15 @@ jobs:
           protocol: ftps
           local-dir: /testapp2/
           server-dir: /site/wwwroot/app1/
-      - name: Add index1 app back
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.30.0
-          inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication1.azurewebsites.net
-      - name: Sleep for 60 seconds
-        run: sleep 60s
-        shell: bash                   
-  #Pull-Blue-app-service-from-Gateway:
-  #  needs: Build_and_deploy_to_Green-app
-  #  steps:
-      - name: Pull-Index0-APP
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.30.0
-          inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication1.azurewebsites.net
-      - name: Sleep for 60 seconds
-        run: sleep 60s
-        shell: bash                 
-  #Deploy-to-Blue-App:
-  #  needs: Pull-Blue-app-service-from-Gateway
-  #  steps:
+        
+  Add-Green-APP-Back:
+    needs: Build-Deploy-green
+    uses: asp-net-test/.github/workflows/green-add.yml@master
+         
+  Pull-Blue-APP-Deployto-Blue:
+    needs: Add-Green-APP-Back
+    uses: asp-net-test/.github/workflows/blue-pull.yml@master
+          
       - name: Sync Files
         uses: SamKirkland/FTP-Deploy-Action@4.3.2
         with: 
@@ -84,10 +54,4 @@ jobs:
          password: ${{ secrets.FTP_PASSWD1 }}
          protocol: ftps
          local-dir: D:/testapp2/
-         server-dir: /site/wwwroot/app1/
-      - name: Add-Index0-APP
-        uses: azure/CLI@v1
-        with:
-          azcliversion: 2.30.0
-          inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication.azurewebsites.net
+         server-dir: /site/wwwroot/app1/     
