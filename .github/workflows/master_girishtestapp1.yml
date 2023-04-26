@@ -29,8 +29,8 @@ jobs:
         shell: bash 
   
   Build_and_deploy_to_Green-app:
-  needs: Pull-Green-app-service-from-Gateway
-  steps:
+    needs: Pull-Green-app-service-from-Gateway
+    steps:
      
      - name: Setup MSBuild path
        uses: microsoft/setup-msbuild@v1.0.2
@@ -62,8 +62,8 @@ jobs:
                        az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication1.azurewebsites.net
                        
   Pull-Blue-app-service-from-Gateway:
-  needs: Build_and_deploy_to_Green-app:
-  steps:
+    needs: Build_and_deploy_to_Green-app:
+    steps:
      - name: Azure CLI script
        uses: azure/CLI@v1
        with:
@@ -71,8 +71,8 @@ jobs:
           inlineScript: |
                        az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication.azurewebsites.net          
   Deploy-to-Blue-App:
-  needs: Pull-Blue-app-service-from-Gateway
-  steps:
+    needs: Pull-Blue-app-service-from-Gateway
+    steps:
      - name: Sync Files
        uses: SamKirkland/FTP-Deploy-Action@4.3.2
        with: 
