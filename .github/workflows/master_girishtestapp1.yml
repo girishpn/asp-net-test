@@ -42,8 +42,7 @@ jobs:
        run: nuget restore
 
      - name: Publish to folder
-       run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="\testapp2"
-       shell: powershell               
+       run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="\testapp2"            
   
      - name: Sync Files
        uses: SamKirkland/FTP-Deploy-Action@4.3.2
@@ -60,16 +59,22 @@ jobs:
           azcliversion: 2.30.0
           inlineScript: |
                        az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication1.azurewebsites.net
-                       
+     - name: Sleep for 60 seconds
+       run: sleep 60s
+       shell: bash                   
   Pull-Blue-app-service-from-Gateway:
     needs: Build_and_deploy_to_Green-app:
     steps:
+    
      - name: Azure CLI script
        uses: azure/CLI@v1
        with:
           azcliversion: 2.30.0
           inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication.azurewebsites.net          
+                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication.azurewebsites.net
+     - name: Sleep for 60 seconds
+       run: sleep 60s
+       shell: bash                 
   Deploy-to-Blue-App:
     needs: Pull-Blue-app-service-from-Gateway
     steps:
@@ -82,9 +87,9 @@ jobs:
          protocol: ftps
          local-dir: D:/testapp2/
          server-dir: /site/wwwroot/app1/
-    - name: Azure CLI script
-      uses: azure/CLI@v1
-        with:
+     - name: Azure CLI script
+       uses: azure/CLI@v1
+       with:
           azcliversion: 2.30.0
           inlineScript: |
                        az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication.azurewebsites.net
