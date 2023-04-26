@@ -11,7 +11,7 @@ on:
 
 jobs:
   pull-green-app:
-    uses: asp-net-test/.github/workflows/green-pull.yml@master
+    uses: girishpn/asp-net-test/.github/workflows/green-pull.yml@master
   Build-Deploy-green:
     needs: pull-green-app
     runs-on: windows-latest
@@ -40,11 +40,11 @@ jobs:
         
   Add-Green-APP-Back:
     needs: Build-Deploy-green
-    uses: asp-net-test/.github/workflows/green-add.yml@master
+    uses: girishpn/asp-net-test/.github/workflows/green-add.yml@master
          
   Pull-Blue-APP:
     needs: Add-Green-APP-Back
-    uses: asp-net-test/.github/workflows/blue-pull.yml@master
+    uses: girishpn/asp-net-test/.github/workflows/blue-pull.yml@master
   DepolytoBlue:
     needs: Pull-Blue-APP
     runs-on: windows-latest
@@ -71,4 +71,4 @@ jobs:
            server-dir: /site/wwwroot/app1/     
   Add-Blue-App-Back:
     needs: DepolytoBlue 
-    uses: asp-net-test/.github/workflows/blue-add.yml@master
+    uses: girishpn/asp-net-test/.github/workflows/blue-add.yml@master
