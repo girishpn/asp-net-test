@@ -41,7 +41,7 @@ jobs:
         run: nuget restore
 
       - name: Publish to folder
-        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="\testapp2"            
+        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="D:\testapp2"            
   
       - name: Sync Files
         uses: SamKirkland/FTP-Deploy-Action@4.3.2
@@ -50,7 +50,7 @@ jobs:
           username: aspdotnetapplication1\$aspdotnetapplication1
           password: ${{ secrets.FTP_PASSWD2 }}
           protocol: ftps
-          local-dir: /testapp2/
+          local-dir: D:/testapp2/
           server-dir: /site/wwwroot/app1/
         
   Add-Green-APP-Back:
@@ -105,7 +105,7 @@ jobs:
         run: nuget restore
 
       - name: Publish to folder
-        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="\testapp2"  
+        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="D:\testapp2"  
       - name: Sync Files
         uses: SamKirkland/FTP-Deploy-Action@4.3.2
         with: 
