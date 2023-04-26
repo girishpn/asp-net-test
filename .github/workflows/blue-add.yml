@@ -1,0 +1,23 @@
+name: Add-Blue-App
+
+on:
+  workflow_call:
+
+jobs:
+  Pull-Green-app-service-from-Gateway:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication.azurewebsites.net
+      - name: Sleep for 60 seconds
+        run: sleep 60s
+        shell: bash 
