@@ -23,7 +23,7 @@ jobs:
         with:
           azcliversion: 2.30.0
           inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication1.azurewebsites.net
+                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication.azurewebsites.net
       - name: Sleep for 60 seconds
         run: sleep 60s
         shell: bash 
@@ -89,7 +89,7 @@ jobs:
         with:
           azcliversion: 2.30.0
           inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication.azurewebsites.net
+                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication1.azurewebsites.net
       - name: Sleep for 60 seconds
         run: sleep 60s
         shell: bash 
