@@ -11,7 +11,22 @@ on:
 
 jobs:
   pull-green-app:
-    uses: girishpn/asp-net-test/.github/workflows/green-pull.yml@master
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication1.azurewebsites.net
+      - name: Sleep for 60 seconds
+        run: sleep 60s
+        shell: bash 
   Build-Deploy-green:
     needs: pull-green-app
     runs-on: windows-latest
@@ -40,13 +55,43 @@ jobs:
         
   Add-Green-APP-Back:
     needs: Build-Deploy-green
-    uses: girishpn/asp-net-test/.github/workflows/green-add.yml@master
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication1.azurewebsites.net
+      - name: Sleep for 60 seconds
+        run: sleep 60s
+        shell: bash 
          
   Pull-Blue-APP:
     needs: Add-Green-APP-Back
-    uses: girishpn/asp-net-test/.github/workflows/blue-pull.yml@master
+  
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication.azurewebsites.net
+      - name: Sleep for 60 seconds
+        run: sleep 60s
+        shell: bash 
   DepolytoBlue:
-    needs: Pull-Blue-APP
     runs-on: windows-latest
     steps:
       - name: Setup MSBuild path
@@ -71,4 +116,17 @@ jobs:
            server-dir: /site/wwwroot/app1/     
   Add-Blue-App-Back:
     needs: DepolytoBlue 
-    uses: girishpn/asp-net-test/.github/workflows/blue-add.yml@master
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication.azurewebsites.net
+    
