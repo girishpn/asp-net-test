@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
   
 #vars:
- #  buildpath: "D:/testapp"
+ #  buildpath: D:/testapp
  #  server1: aspdotnetapplication.azurewebsites.net
  #  server2: aspdotnetapplication1.azurewebsites.net
  #  app1: waws-prod-blu-327.ftp.azurewebsites.windows.net
