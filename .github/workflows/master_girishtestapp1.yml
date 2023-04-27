@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       
-      - name: Check URL status code
+      - name: Check Green APP URL status code
         run: |
               status=$(curl --head --silent --output /dev/null --write-out '%{http_code}' https://${{vars.server2}}/app1 )
               if [[ "$status" -ne 200 ]]; then
