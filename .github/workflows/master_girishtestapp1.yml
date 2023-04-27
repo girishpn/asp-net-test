@@ -66,7 +66,7 @@ jobs:
       
       - name: Check URL status code
         run: |
-              status=$(curl --head --silent --output /dev/null --write-out '%{http_code}' http://${{vars.server2}}/app1 )
+              status=$(curl --head --silent --output /dev/null --write-out '%{http_code}' https://${{vars.server2}}/app1 )
               if [[ "$status" -ne 200 ]]; then
               echo "Error: URL returned status code $status"
               exit 1
