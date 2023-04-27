@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
          name: appdeploy
-         path: ${{env.buildpath}/
+         path: ${{env.buildpath}}/
          retention-days: 5
       - name: Sync Files
         uses: SamKirkland/FTP-Deploy-Action@4.3.2
