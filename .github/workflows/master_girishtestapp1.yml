@@ -64,6 +64,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       
+      - name: Check URL status code
+        run: |
+              status=$(curl --head --silent --output /dev/null --write-out '%{http_code}' http://applicationipgateway.eastus.cloudapp.azure.com/app1)
+              if [[ "$status" -ne 200 ]]; then
+              echo "Error: URL returned status code $status"
+              exit 1
+              fi
       - name: Azure Login
         uses: azure/login@v1
         with:
