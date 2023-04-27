@@ -9,15 +9,15 @@ on:
       - master
   workflow_dispatch:
   
-env:
-   buildpath: "D:/testapp"
-   server1: aspdotnetapplication.azurewebsites.net
-   server2: aspdotnetapplication1.azurewebsites.net
-   app1: waws-prod-blu-327.ftp.azurewebsites.windows.net
-   app2: waws-prod-blu-327.ftp.azurewebsites.windows.net
-   id1: aspdotnetapplication\$aspdotnetapplication
-   id2: aspdotnetapplication1\$aspdotnetapplication1
-   gateway: AppGW
+#env:
+ #  buildpath: "D:/testapp"
+ #  server1: aspdotnetapplication.azurewebsites.net
+ #  server2: aspdotnetapplication1.azurewebsites.net
+ #  app1: waws-prod-blu-327.ftp.azurewebsites.windows.net
+ #  app2: waws-prod-blu-327.ftp.azurewebsites.windows.net
+ #  id1: aspdotnetapplication\$aspdotnetapplication
+ #  id2: aspdotnetapplication1\$aspdotnetapplication1
+ #  gateway: AppGW
    
 
 jobs:
