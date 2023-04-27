@@ -8,6 +8,17 @@ on:
     branches:
       - master
   workflow_dispatch:
+  
+env:
+   buildpath: D:/testapp
+   server1: aspdotnetapplication.azurewebsites.net
+   server2: aspdotnetapplication1.azurewebsites.net
+   app1: waws-prod-blu-327.ftp.azurewebsites.windows.net
+   app2: waws-prod-blu-327.ftp.azurewebsites.windows.net
+   id1: aspdotnetapplication\$aspdotnetapplication
+   id2: aspdotnetapplication1\$aspdotnetapplication1
+   gateway: AppGW
+   
 
 jobs:
   pull-green-app:
@@ -23,7 +34,7 @@ jobs:
         with:
           azcliversion: 2.30.0
           inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication.azurewebsites.net
+                       az network application-gateway address-pool update -g ${{env.gateway}} --gateway-name AGtest -n pool1 --servers ${{env.server1}}
       - name: Sleep for 60 seconds
         run: sleep 60s
         shell: bash 
@@ -42,21 +53,21 @@ jobs:
         run: nuget restore
 
       - name: Publish to folder
-        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="D:\testapp2"            
+        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="${{env.buildpath}}"            
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-         name: testapp
-         path: D:\testapp2\**
+         name: appdeploy
+         path: ${{env.buildpath}/
          retention-days: 5
       - name: Sync Files
         uses: SamKirkland/FTP-Deploy-Action@4.3.2
         with: 
-          server: waws-prod-blu-327.ftp.azurewebsites.windows.net
-          username: aspdotnetapplication1\$aspdotnetapplication1
+          server: "${{env.app2}}"
+          username: ${{env.id2}}
           password: ${{ secrets.FTP_PASSWD2 }}
           protocol: ftps
-          local-dir: D:/testapp2/
+          local-dir: ${{env.buildpath}}/
           server-dir: /site/wwwroot/app1/
         
   Add-Green-APP-Back:
@@ -74,7 +85,7 @@ jobs:
         with:
           azcliversion: 2.30.0
           inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication1.azurewebsites.net
+                       az network application-gateway address-pool update -g ${{env.gateway}} --gateway-name AGtest -n pool1 --add backendAddresses fqdn=${{env.server2}}
       - name: Sleep for 60 seconds
         run: sleep 60s
         shell: bash 
@@ -94,7 +105,7 @@ jobs:
         with:
           azcliversion: 2.30.0
           inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --servers aspdotnetapplication1.azurewebsites.net
+                       az network application-gateway address-pool update -g ${{env.gateway}} --gateway-name AGtest -n pool1 --servers ${{env.server2}}
       - name: Sleep for 60 seconds
         run: sleep 60s
         shell: bash 
@@ -104,16 +115,16 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: testapp
-          path: D:/testapp2
+          name: appdeploy
+          path: ${{env.buildpath}}/
       - name: Sync Files
         uses: SamKirkland/FTP-Deploy-Action@4.3.2
         with: 
-           server: waws-prod-blu-327.ftp.azurewebsites.windows.net
-           username: aspdotnetapplication\$aspdotnetapplication
+           server: "${{env.app2}}"
+           username: ${{env.id1}}
            password: ${{ secrets.FTP_PASSWD1 }}
            protocol: ftps
-           local-dir: D:/testapp2/
+           local-dir: ${{env.buildpath}}/
            server-dir: /site/wwwroot/app1/     
   Add-Blue-App-Back:
     needs: DepolytoBlue 
@@ -129,5 +140,5 @@ jobs:
         with:
           azcliversion: 2.30.0
           inlineScript: |
-                       az network application-gateway address-pool update -g AppGW --gateway-name AGtest -n pool1 --add backendAddresses fqdn=aspdotnetapplication.azurewebsites.net
+                       az network application-gateway address-pool update -g ${{env.gateway}} --gateway-name AGtest -n pool1 --add backendAddresses fqdn=${{env.server1}}
     
