@@ -9,7 +9,7 @@ on:
       - master
   workflow_dispatch:
   
-#env:
+#vars:
  #  buildpath: "D:/testapp"
  #  server1: aspdotnetapplication.azurewebsites.net
  #  server2: aspdotnetapplication1.azurewebsites.net
@@ -34,7 +34,7 @@ jobs:
         with:
           azcliversion: 2.30.0
           inlineScript: |
-                       az network application-gateway address-pool update -g ${{env.gateway}} --gateway-name AGtest -n pool1 --servers ${{env.server1}}
+                       az network application-gateway address-pool update -g ${{vars.gateway}} --gateway-name AGtest -n pool1 --servers ${{vars.server1}}
       - name: Sleep for 60 seconds
         run: sleep 60s
         shell: bash 
@@ -53,21 +53,21 @@ jobs:
         run: nuget restore
 
       - name: Publish to folder
-        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="${{env.buildpath}}"            
+        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="${{vars.buildpath}}"            
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
          name: appdeploy
-         path: ${{env.buildpath}}/
+         path: ${{vars.buildpath}}/
          retention-days: 5
       - name: Sync Files
         uses: SamKirkland/FTP-Deploy-Action@4.3.2
         with: 
-          server: "${{env.app2}}"
-          username: ${{env.id2}}
+          server: "${{vars.app2}}"
+          username: ${{vars.id2}}
           password: ${{ secrets.FTP_PASSWD2 }}
           protocol: ftps
-          local-dir: ${{env.buildpath}}/
+          local-dir: ${{vars.buildpath}}/
           server-dir: /site/wwwroot/app1/
         
   Add-Green-APP-Back:
@@ -85,7 +85,7 @@ jobs:
         with:
           azcliversion: 2.30.0
           inlineScript: |
-                       az network application-gateway address-pool update -g ${{env.gateway}} --gateway-name AGtest -n pool1 --add backendAddresses fqdn=${{env.server2}}
+                       az network application-gateway address-pool update -g ${{vars.gateway}} --gateway-name AGtest -n pool1 --add backendAddresses fqdn=${{vars.server2}}
       - name: Sleep for 60 seconds
         run: sleep 60s
         shell: bash 
@@ -105,7 +105,7 @@ jobs:
         with:
           azcliversion: 2.30.0
           inlineScript: |
-                       az network application-gateway address-pool update -g ${{env.gateway}} --gateway-name AGtest -n pool1 --servers ${{env.server2}}
+                       az network application-gateway address-pool update -g ${{vars.gateway}} --gateway-name AGtest -n pool1 --servers ${{vars.server2}}
       - name: Sleep for 60 seconds
         run: sleep 60s
         shell: bash 
@@ -116,15 +116,15 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: appdeploy
-          path: ${{env.buildpath}}/
+          path: ${{vars.buildpath}}/
       - name: Sync Files
         uses: SamKirkland/FTP-Deploy-Action@4.3.2
         with: 
-           server: "${{env.app2}}"
-           username: ${{env.id1}}
+           server: "${{vars.app2}}"
+           username: ${{vars.id1}}
            password: ${{ secrets.FTP_PASSWD1 }}
            protocol: ftps
-           local-dir: ${{env.buildpath}}/
+           local-dir: ${{vars.buildpath}}/
            server-dir: /site/wwwroot/app1/     
   Add-Blue-App-Back:
     needs: DepolytoBlue 
@@ -140,5 +140,4 @@ jobs:
         with:
           azcliversion: 2.30.0
           inlineScript: |
-                       az network application-gateway address-pool update -g ${{env.gateway}} --gateway-name AGtest -n pool1 --add backendAddresses fqdn=${{env.server1}}
-    
+                       az network application-gateway address-pool update -g ${{vars.gateway}} --gateway-name AGtest -n pool1 --add backendAddresses fqdn=${{vars.server1}} 
