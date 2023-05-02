@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # Mor GiHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP app to Azure Web Apps Behind Gateway
+name: Build and deploy PROD app to Azure Web Apps Behind Gateway
 
 on:
   push:
