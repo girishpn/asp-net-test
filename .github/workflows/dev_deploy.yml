@@ -12,7 +12,7 @@ on:
 jobs:
   pull-green-app:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev'
+#    if: github.ref == 'refs/heads/dev'
     steps:
       - name: Azure Login
         uses: azure/login@v1
