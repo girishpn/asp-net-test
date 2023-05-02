@@ -1,0 +1,140 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# Mor GiHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy ASP app to Azure Web Apps Behind Gateway
+
+on:
+  push:
+    branches:
+      - qa
+  workflow_dispatch:
+
+jobs:
+  pull-green-app:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/qa'
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+                       az network application-gateway address-pool update -g ${{vars.gateway}} --gateway-name AGtest -n pool1 --servers ${{vars.server1}}
+      - name: Sleep for 60 seconds
+        run: sleep 60s
+        shell: bash 
+  Build-Deploy-green:
+    needs: pull-green-app
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup MSBuild path
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.0.5
+
+      - name: Restore NuGet packages
+        run: nuget restore
+
+      - name: Publish to folder
+        run: msbuild /nologo /verbosity:m /t:Build /t:pipelinePreDeployCopyAllFilesToOneFolder /p:WebPublishMethod=Package /p:DeleteExistingFiles=True /p:SkipExtraFilesOnServer=True /p:_PackageTempDir="${{vars.buildpath}}"            
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+         name: appdeploy
+         path: ${{vars.buildpath}}/
+         retention-days: 5
+      - name: Sync Files
+        uses: SamKirkland/FTP-Deploy-Action@4.3.2
+        with: 
+          server: "${{vars.app2}}"
+          username: ${{vars.id2}}
+          password: ${{ secrets.FTP_PASSWD2 }}
+          protocol: ftps
+          local-dir: ${{vars.buildpath}}/
+          server-dir: /site/wwwroot/app1/
+        
+  Add-Green-APP-Back:
+    needs: Build-Deploy-green
+    runs-on: ubuntu-latest
+    steps:
+      
+      - name: Check Green APP URL status code
+        run: |
+              status=$(curl --head --silent --output /dev/null --write-out '%{http_code}' https://${{vars.server2}}/app1 )
+              if [[ "$status" -ne 200 ]]; then
+              echo "Error: URL returned status code $status"
+              exit 1
+              fi
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+                       az network application-gateway address-pool update -g ${{vars.gateway}} --gateway-name AGtest -n pool1 --add backendAddresses fqdn=${{vars.server2}}
+      - name: Sleep for 60 seconds
+        run: sleep 60s
+        shell: bash 
+         
+  Pull-Blue-APP:
+    needs: Add-Green-APP-Back
+  
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+                       az network application-gateway address-pool update -g ${{vars.gateway}} --gateway-name AGtest -n pool1 --servers ${{vars.server2}}
+      - name: Sleep for 60 seconds
+        run: sleep 60s
+        shell: bash 
+  DepolytoBlue:
+    needs: Pull-Blue-APP
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: appdeploy
+          path: ${{vars.buildpath}}/
+      - name: Sync Files
+        uses: SamKirkland/FTP-Deploy-Action@4.3.2
+        with: 
+           server: "${{vars.app2}}"
+           username: ${{vars.id1}}
+           password: ${{ secrets.FTP_PASSWD1 }}
+           protocol: ftps
+           local-dir: ${{vars.buildpath}}/
+           server-dir: /site/wwwroot/app1/     
+  Add-Blue-App-Back:
+    needs: DepolytoBlue 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure CLI script
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.30.0
+          inlineScript: |
+                       az network application-gateway address-pool update -g ${{vars.gateway}} --gateway-name AGtest -n pool1 --add backendAddresses fqdn=${{vars.server1}} 
